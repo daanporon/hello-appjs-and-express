@@ -9,8 +9,8 @@ var express = require('express'),
 ;
 
 var appRouter = express.createServer();
+appRouter.set('view engine', 'jade');
 appRouter.use(express.bodyParser());
-appRouter.register('jade', require('jade').express);
 
 /**
  * Set up the express routes

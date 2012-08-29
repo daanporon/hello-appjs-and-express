@@ -5,42 +5,56 @@
 
 var express = require('express'),
 	appjs = require('appjs'),
+	routes = require('./routes'),
 	utils = require('util')
 ;
 
-var appRouter = express.createServer();
-appRouter.set('view engine', 'jade');
-appRouter.use(express.bodyParser());
+var app = module.exports = express.createServer();
+
+// Configuration
+app.configure(function() {
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(__dirname + '/public'));
+});
+
+// Routes
+app.get('/', routes.index);
+app.all('/video', routes.video);
 
 /**
- * Set up the express routes
+ * Listen to http requests
  */
-appRouter.get('/', function(req, res, next){
-  res.render('index.jade', { layout: false, title: 'Express' });
+app.listen(3000, function(){
+  console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
+
 
 /**
  * Setup AppJS
  */
+appjs.router.handle = app.handle.bind(app);
 
-// override AppJS's built in request handler with connect
-appjs.router.handle = appRouter.handle.bind(appRouter);
-
-// create window
 var window = appjs.createWindow({
   width : 640,
   height: 460
 });
 
-// show the window after initialization
 window.on('create', function(){
   window.frame.show();
   window.frame.center();
 });
 
-// add require/process/module to the window global object for debugging from the DevTools
 window.on('ready', function(){
   window.require = require;
   window.process = process;
   window.module = module;
+  window.addEventListener('keydown', function(e){
+    if (e.keyIdentifier === 'F5') {
+      window.frame.openDevTools();
+    }
+  });
 });

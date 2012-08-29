@@ -23,7 +23,7 @@ app.configure(function() {
 
 // Routes
 app.get('/', routes.index);
-app.all('/video', routes.video);
+app.get('/video', routes.video);
 
 /**
  * Listen to http requests
@@ -40,7 +40,8 @@ appjs.router.handle = app.handle.bind(app);
 
 var window = appjs.createWindow({
   width : 640,
-  height: 460
+  height: 460,
+  url: 'http://appjs/'
 });
 
 window.on('create', function(){
